@@ -1,0 +1,72 @@
+/* Container principal para alinhas as divs lado a lado */
+
+  /* Lista de legendas (à esquerda) */
+  .legend-list {
+    display: flex;
+    flex-direction: column; /* Coloca as legendas verticalmente */
+    margin-right: 20px; /* Espaço entre as legendas e a div à direita */
+    width: 200px; /* Defina uma largura fixa para a lista de legendas */
+  }
+  
+  /* Cada item dentro da lista de legendas */
+  .legend-list div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  /* Ícones dentro da lista de legendas */
+  .legend-list img {
+    width: 24px; /* Ajuste o tamanho */
+    height: 24px; /* Ajuste o tamanho */
+    margin-right: 8px;
+  }
+  
+/* Estilo para destacar a categoria selecionada */
+.selected-category {
+    border: 2px solid black; /* Contorno azul */
+    padding: 5px; 
+  }
+  
+  /* Para os botões de excluir e editar */
+  .legend-list button {
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 12px;
+  }
+  
+  .all {
+    display: flex;
+    flex-direction: column; /* Organiza os elementos na vertical */
+  }
+  
+  .modos {
+    display: flex;
+    margin: 0 auto; /* Centraliza horizontalmente */
+    width: fit-content; /* Garante que o modo tenha o tamanho adequado */
+    margin-left: 50%;
+    font-size: 10px;
+  }
+  
+  
+  .main-container {
+    display: flex; /* Garante que as divs fiquem lado a lado */
+    align-items: flex-start; /* Alinha as divs no topo */
+    justify-content: flex-start; /* Garante que as divs comecem da esquerda */
+    gap: 20px; /* Espaço entre a lista de legendas e o mapa */
+  }
+  
+  .botoes{
+    display: flex;
+  }
+
+  .legendas-title {
+    display: flex;  /* Torna a div um container flexível */
+    justify-content: center; /* Centraliza o texto horizontalmente */
+    align-items: center; /* Centraliza o texto verticalmente */
+    text-align: center;  /* Centraliza o texto dentro da div */
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
