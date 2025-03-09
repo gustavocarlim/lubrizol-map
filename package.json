@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage":"https://gustavocarlim.github.io/mapa/",
+  "homepage":"https://gustavocarlim.github.io/lubrizol-map",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
