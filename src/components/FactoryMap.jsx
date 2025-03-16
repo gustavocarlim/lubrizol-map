@@ -14,9 +14,24 @@ import icon7 from "../assets/mechanic.png";
 import icon8 from "../assets/open-box.png";
 import icon9 from "../assets/project.png";
 import icon10 from "../assets/warning.png";
+import black from "../assets/black.svg";
+import red from "../assets/red.svg";
+import blue from "../assets/blue.svg";
+import green from "../assets/green.svg";
+import yellow from "../assets/yellow.svg";
+import orange from "../assets/orange.svg";
+import purple from "../assets/purple.svg";
+import brown from "../assets/brown.svg";
+import white from "../assets/white.svg";  
+import "leaflet.fullscreen";
 import "../FactoryMap.css";
 
-const bounds = [[-35.42, -66.10], [35.42, 66.10]];
+
+
+
+
+const fullBounds = [[-42, -83], [42, 83]];
+const normalBounds = [[-35.40, -66.10], [35.40, 66.10]];
 
 const AddPin = ({ onAddPin, isEditingMode }) => {
   useMapEvents({
@@ -40,6 +55,15 @@ const icons = {
   "Open Box": icon8,
   "Project": icon9,
   "Warning": icon10,
+  "Black": black,
+  "Red": red,
+  "Blue":blue,
+  "Green": green,
+  "Yellow": yellow,
+  "Orange": orange,
+  "Purple": purple,
+  "Brown": brown,
+  "White": white,
 };
 
 Modal.setAppElement("#root");
@@ -57,6 +81,8 @@ const FactoryMap = () => {
   const [isMapMode, setIsMapMode] = useState(true); // Modo de exploração do mapa
   const [isPopupOpen, setIsPopupOpen] = useState(false); // Controle de abertura do popup
   const [canAddPin, setCanAddPin] = useState(true); // Controle para permitir adicionar pinos
+  const [currentBounds, setCurrentBounds] = useState(normalBounds);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const createIcon = (iconUrl) => {
     return L.icon({
@@ -163,19 +189,69 @@ const FactoryMap = () => {
     setIsPopupOpen(id);
   };
 
+  const generateShareableLink = () => {
+    const data = { pins, categories };
+    const encodedData = encodeURIComponent(JSON.stringify(data));
+    const shareableURL = `${window.location.origin}?data=${encodedData}`;
+  
+    navigator.clipboard.writeText(shareableURL)
+      .then(() => alert("Link copiado para a área de transferência!"))
+      .catch(err => console.error("Erro ao copiar o link:", err));
+  };
+  
+
+
   useEffect(() => {
+    // Alterna o modo de edição ao pressionar "M"
     const handleKeyDown = (event) => {
-      // Verifica se a tecla pressionada foi "M" e alterna o modo
       if (event.key === "m" || event.key === "M") {
-        setIsEditingMode((prevState) => !prevState); // Alterna entre os modos
+        setIsEditingMode((prevState) => !prevState);
       }
     };
-
+  
     window.addEventListener("keydown", handleKeyDown);
+  
+    // Lê os parâmetros da URL para carregar os pinos e categorias compartilhados
+    const params = new URLSearchParams(window.location.search);
+    const encodedData = params.get("data");
+  
+    if (encodedData) {
+      try {
+        const decodedData = JSON.parse(decodeURIComponent(encodedData));
+        if (decodedData.pins) {
+          setPins(decodedData.pins);
+        }
+        if (decodedData.categories) {
+          setCategories(decodedData.categories);
+        }
+      } catch (error) {
+        console.error("Erro ao decodificar os dados:", error);
+      }
+    }
+  
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      if (document.fullscreenElement) {
+        setCurrentBounds(fullBounds); // Ajusta o mapa
+        setIsFullScreen(true); // Atualiza o estado
+      } else {
+        setCurrentBounds(normalBounds); // Volta ao normal
+        setIsFullScreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+    };
+  }, []);
+
 
   return (
     <div className="all">
@@ -184,7 +260,6 @@ const FactoryMap = () => {
       <div className="modos">
         <h2>{isEditingMode ? "Modo de Edição de Marcadores" : "Modo de Exploração do Mapa"}</h2>
       </div>
-
       <Modal
         isOpen={showModal}
         onRequestClose={() => setShowModal(false)}
@@ -203,7 +278,7 @@ const FactoryMap = () => {
             padding: "15px",
             backgroundColor: "white",
             borderRadius: "10px",
-            width: "250px",
+            width: "650px",
             height: "auto",
           },
         }}
@@ -255,6 +330,7 @@ const FactoryMap = () => {
         <button onClick={() => setShowModal(true)}>Adicionar Legenda</button>
         <button onClick={clearPins} style={{ marginLeft: "10px" }}>Limpar Pinos</button>
         </div>
+        <button onClick={generateShareableLink}>Gerar Link Compartilhável</button>
         </div>
         <div className="other-content">
           <MapContainer
@@ -262,17 +338,19 @@ const FactoryMap = () => {
             zoom={4}
             minZoom={3.9}
             maxZoom={8}
-            maxBounds={bounds}
+            maxBounds={currentBounds}
             maxBoundsViscosity={1.0}
+            // style={{ width: "100%", height: "100%" }}
             style={{ height: "93vh", width: "82vw", position: "relative", zIndex: 1 }}
+            fullscreenControl={true} 
           >
-            <ImageOverlay url={mapa} bounds={bounds} />
+            <ImageOverlay url={mapa} bounds={currentBounds} />
             {pins.map((pin) => (
               <Marker
                 key={pin.id}
                 position={pin.position}
                 icon={createIcon(categories[pin.category])}
-                draggable={isEditingMode} // Marca os pinos como arrastáveis somente em modo de edição
+                draggable={isEditingMode} 
                 eventHandlers={{
                   dragend(e) {
                     if (isEditingMode) {
